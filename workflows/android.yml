@@ -1,0 +1,35 @@
+
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential libssl-dev libffi-dev python3-dev python3-pip openjdk-17-jdk zip unzip
+          pip install buildozer cython virtualenv
+
+      - name: Build APK
+        run: |
+          sudo apt install -y git
+          buildozer android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: coin-detector-apk
+          path: bin/*.apk
